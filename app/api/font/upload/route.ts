@@ -5,12 +5,6 @@ import { validateFontBuffer } from '@/lib/font-validator'
 import formidable from 'formidable'
 import { promises as fs } from 'fs'
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-}
-
 export async function POST(request: NextRequest) {
   try {
     // Get user from auth header
