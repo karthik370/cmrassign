@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const { data: projects, error } = await supabaseAdmin
+    const { data: projects, error } = await (supabaseAdmin as any)
       .from('projects')
       .select('*, fonts(*)')
       .eq('user_id', user.id)

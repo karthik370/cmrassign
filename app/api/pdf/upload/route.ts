@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Ensure user profile exists
-    const { data: profile } = await supabaseAdmin
+    const { data: profile } = await (supabaseAdmin as any)
       .from('profiles')
       .select('id')
       .eq('id', user.id)
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
 
     if (!profile) {
       // Create profile if it doesn't exist
-      await supabaseAdmin
+      await (supabaseAdmin as any)
         .from('profiles')
         .insert({
           id: user.id,
@@ -131,7 +131,7 @@ export async function POST(request: NextRequest) {
 
     // Create project
     console.log(`📝 Creating project with ${analysis.pageCount} pages`)
-    const { data: project, error: projectError } = await supabaseAdmin
+    const { data: project, error: projectError } = await (supabaseAdmin as any)
       .from('projects')
       .insert({
         user_id: user.id,
@@ -188,7 +188,7 @@ export async function POST(request: NextRequest) {
     }
 
     console.log(`✅ Inserting ${pageEdits.length} page edits`)
-    const { error: pageEditsError } = await supabaseAdmin
+    const { error: pageEditsError } = await (supabaseAdmin as any)
       .from('page_edits')
       .insert(pageEdits as any)
 
@@ -199,7 +199,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Log usage
-    await supabaseAdmin.from('usage_logs').insert({
+    await (supabaseAdmin as any).from('usage_logs').insert({
       user_id: user.id,
       action: 'pdf_uploaded',
       metadata: { project_id: (project as any).id, page_count: analysis.pageCount },

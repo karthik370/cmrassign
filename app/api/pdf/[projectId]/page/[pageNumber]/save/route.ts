@@ -27,7 +27,7 @@ export async function POST(
     }
 
     // Verify project ownership
-    const { data: project } = await supabaseAdmin
+    const { data: project } = await (supabaseAdmin as any)
       .from('projects')
       .select('id')
       .eq('id', params.projectId)
@@ -45,7 +45,7 @@ export async function POST(
     const { text_content, ink_color, line_colors, dimensions, drawing_data } = body
 
     // Upsert page edit
-    const { data: pageEdit, error } = await supabaseAdmin
+    const { data: pageEdit, error } = await (supabaseAdmin as any)
       .from('page_edits')
       .upsert(
         {

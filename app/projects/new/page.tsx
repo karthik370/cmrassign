@@ -16,11 +16,12 @@ import { supabase } from '@/lib/supabase'
 interface LocalFont {
   id: string
   name: string
-  fileName: string
-  fileSize: number
+  fileName?: string
+  fileSize?: number
   type: 'ttf' | 'otf'
   url: string
-  isLocal: true
+  isLocal?: true
+  fontType?: 'local' | 'uploaded'
 }
 
 export default function NewProjectPage() {
@@ -49,7 +50,7 @@ export default function NewProjectPage() {
       formData.append('name', name)
       formData.append('fontUrl', selectedFont.url)
       formData.append('fontName', selectedFont.name)
-      formData.append('fontFileName', selectedFont.fileName)
+      formData.append('fontFileName', selectedFont.fileName || selectedFont.name)
 
       const response = await axios.post('/api/pdf/upload-with-local-font', formData, {
         headers: { 

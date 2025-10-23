@@ -28,7 +28,7 @@ export async function DELETE(
     }
 
     // Get project details
-    const { data: project, error: fetchError } = await supabaseAdmin
+    const { data: project, error: fetchError } = await (supabaseAdmin as any)
       .from('projects')
       .select('*')
       .eq('id', params.id)
@@ -43,10 +43,10 @@ export async function DELETE(
     }
 
     // Delete page edits (cascade should handle this, but being explicit)
-    await supabaseAdmin.from('page_edits').delete().eq('project_id', params.id)
+    await (supabaseAdmin as any).from('page_edits').delete().eq('project_id', params.id)
 
     // Delete project from database
-    const { error: deleteError } = await supabaseAdmin
+    const { error: deleteError } = await (supabaseAdmin as any)
       .from('projects')
       .delete()
       .eq('id', params.id)

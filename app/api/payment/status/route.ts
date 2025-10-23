@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get user subscription
-    const { data: subscription, error: subError } = await supabaseAdmin
+    const { data: subscription, error: subError } = await (supabaseAdmin as any)
       .from('user_subscriptions')
       .select('*')
       .eq('user_id', user.id)
@@ -34,12 +34,12 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      hasAccess: subscription.is_active,
+      hasAccess: (subscription as any).is_active,
       subscription: {
-        isActive: subscription.is_active,
-        paymentStatus: subscription.payment_status,
-        amountPaid: subscription.amount_paid,
-        paidAt: subscription.paid_at,
+        isActive: (subscription as any).is_active,
+        paymentStatus: (subscription as any).payment_status,
+        amountPaid: (subscription as any).amount_paid,
+        paidAt: (subscription as any).paid_at,
       },
     })
   } catch (error: any) {

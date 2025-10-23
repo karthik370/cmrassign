@@ -29,7 +29,7 @@ export async function POST(
     }
 
     // Get project with font
-    const { data: project, error: projectError } = await supabaseAdmin
+    const { data: project, error: projectError } = await (supabaseAdmin as any)
       .from('projects')
       .select('*, fonts(*)')
       .eq('id', params.projectId)
@@ -44,7 +44,7 @@ export async function POST(
     }
 
     // Get all page edits
-    const { data: pageEdits, error: pageEditsError } = await supabaseAdmin
+    const { data: pageEdits, error: pageEditsError } = await (supabaseAdmin as any)
       .from('page_edits')
       .select('*')
       .eq('project_id', params.projectId)
@@ -122,7 +122,7 @@ export async function POST(
     }
 
     // Log usage
-    await supabaseAdmin.from('usage_logs').insert({
+    await (supabaseAdmin as any).from('usage_logs').insert({
       user_id: user.id,
       action: 'pdf_downloaded',
       metadata: { project_id: params.projectId },

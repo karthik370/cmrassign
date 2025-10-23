@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get payment from database
-    const { data: payment } = await supabaseAdmin
+    const { data: payment } = await (supabaseAdmin as any)
       .from('payments')
       .select('*')
       .eq('order_id', ORDERID)
@@ -37,30 +37,30 @@ export async function POST(request: NextRequest) {
     const isSuccess = STATUS === 'TXN_SUCCESS'
 
     // Update payment record
-    await supabaseAdmin
+    await (supabaseAdmin as any)
       .from('payments')
       .update({
         status: isSuccess ? 'success' : 'failed',
         transaction_id: TXNID,
         payment_response: body,
         updated_at: new Date().toISOString(),
-      })
-      .eq('id', payment.id)
+      } as any)
+      .eq('id', (payment as any).id)
 
     // If payment successful, activate subscription
     if (isSuccess) {
-      await supabaseAdmin
+      await (supabaseAdmin as any)
         .from('user_subscriptions')
         .update({
           is_active: true,
           payment_status: 'paid',
-          amount_paid: payment.amount,
+          amount_paid: (payment as any).amount,
           paid_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
-        })
-        .eq('user_id', payment.user_id)
+        } as any)
+        .eq('user_id', (payment as any).user_id)
 
-      console.log(`✅ Payment successful and subscription activated for user ${payment.user_id}`)
+      console.log(`✅ Payment successful and subscription activated for user ${(payment as any).user_id}`)
       
       return NextResponse.redirect(new URL('/payment/success', request.url))
     } else {

@@ -25,11 +25,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Get payment from database
-    const { data: payment, error: paymentError} = await supabaseAdmin
+    const { data: payment, error: paymentError} = await (supabaseAdmin as any)
       .from('payments')
       .select('*')
       .eq('order_id', payment_request_id || paymentVerification.payment.payment_request_id)
-      .single() as any
+      .single()
 
     if (paymentError || !payment) {
       return NextResponse.json({ 
