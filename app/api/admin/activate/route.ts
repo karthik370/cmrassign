@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
 import { supabaseAdmin } from '@/lib/supabase'
 
 // Admin emails - ONLY these emails can activate users
@@ -9,22 +11,12 @@ const ADMIN_EMAILS = [
 
 export async function POST(request: NextRequest) {
   try {
-    // Get session from cookies
-    const cookieHeader = request.headers.get('cookie') || ''
-    const cookies = cookieHeader.split(';').reduce((acc, cookie) => {
-      const [key, value] = cookie.trim().split('=')
-      if (key) acc[key] = value
-      return acc
-    }, {} as Record<string, string>)
+    const supabase = createRouteHandlerClient({ cookies })
 
-    // Try to get admin user from session
-    let adminUser = null
-    const accessToken = cookies['sb-access-token'] || cookies['supabase-access-token']
-    
-    if (accessToken) {
-      const { data: { user: authUser } } = await supabaseAdmin.auth.getUser(accessToken)
-      adminUser = authUser
-    }
+    // Get current admin user session
+    const { data: { user: adminUser }, error: authError } = await supabase.auth.getUser()
+
+    console.log('🔍 Admin activation check - User:', adminUser?.email || 'no user')
 
     // Check if user is admin
     if (!adminUser || !ADMIN_EMAILS.includes(adminUser.email || '')) {
