@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/Button'
 import { XCircle, ArrowLeft, RefreshCcw } from 'lucide-react'
 import Link from 'next/link'
 
+export const dynamic = 'force-dynamic'
+
 export default function PaymentFailedPage() {
   const router = useRouter()
   const searchParams = useSearchParams()

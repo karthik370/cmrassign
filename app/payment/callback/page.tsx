@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
 import { Loader2 } from 'lucide-react'
 
+export const dynamic = 'force-dynamic'
+
 export default function PaymentCallbackPage() {
   const router = useRouter()
   const searchParams = useSearchParams()

@@ -7,6 +7,8 @@ import { CheckCircle, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import confetti from 'canvas-confetti'
 
+export const dynamic = 'force-dynamic'
+
 export default function PaymentSuccessPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
