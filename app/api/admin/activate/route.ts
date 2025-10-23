@@ -9,14 +9,31 @@ const ADMIN_EMAILS = [
 
 export async function POST(request: NextRequest) {
   try {
-    // Check authentication
-    const authHeader = request.headers.get('cookie')
-    if (!authHeader) {
-      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
+    // Get session from cookies
+    const cookieHeader = request.headers.get('cookie') || ''
+    const cookies = cookieHeader.split(';').reduce((acc, cookie) => {
+      const [key, value] = cookie.trim().split('=')
+      if (key) acc[key] = value
+      return acc
+    }, {} as Record<string, string>)
+
+    // Try to get admin user from session
+    let adminUser = null
+    const accessToken = cookies['sb-access-token'] || cookies['supabase-access-token']
+    
+    if (accessToken) {
+      const { data: { user: authUser } } = await supabaseAdmin.auth.getUser(accessToken)
+      adminUser = authUser
     }
 
-    // You can add more sophisticated auth check here
-    // For now, we'll rely on client-side protection
+    // Check if user is admin
+    if (!adminUser || !ADMIN_EMAILS.includes(adminUser.email || '')) {
+      console.log('❌ Admin activation denied for:', adminUser?.email || 'no user')
+      return NextResponse.json({ success: false, error: 'Unauthorized - Admin access only' }, { status: 401 })
+    }
+
+    console.log('✅ Admin activation by:', adminUser.email)
+
     const { userId, paymentId } = await request.json()
 
     if (!userId) {
