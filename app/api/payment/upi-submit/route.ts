@@ -5,10 +5,16 @@ export async function POST(request: NextRequest) {
   try {
     const { utrNumber, amount, userEmail } = await request.json()
 
+    console.log('📥 UPI Submit received:', { utrNumber, userEmail, amount })
+
     if (!utrNumber || !userEmail) {
+      console.log('❌ Validation failed:', { 
+        hasUTR: !!utrNumber, 
+        hasEmail: !!userEmail 
+      })
       return NextResponse.json({ 
         success: false, 
-        error: 'UTR number and email are required' 
+        error: `Missing required fields. UTR: ${!!utrNumber}, Email: ${!!userEmail}` 
       }, { status: 400 })
     }
 
