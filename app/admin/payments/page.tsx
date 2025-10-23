@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
+import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/Button'
 import { Check, Clock, ExternalLink, RefreshCw, Lock, Copy } from 'lucide-react'
 
@@ -48,7 +49,14 @@ export default function AdminPaymentsPage() {
   const fetchPayments = async () => {
     setLoading(true)
     try {
-      const response = await fetch('/api/admin/payments')
+      // Get session token
+      const { data: { session } } = await supabase.auth.getSession()
+      
+      const response = await fetch('/api/admin/payments', {
+        headers: {
+          'Authorization': `Bearer ${session?.access_token}`
+        }
+      })
       const data = await response.json()
       if (data.success) {
         setPayments(data.payments || [])
@@ -67,9 +75,15 @@ export default function AdminPaymentsPage() {
 
     setActivating(paymentId)
     try {
+      // Get session token
+      const { data: { session } } = await supabase.auth.getSession()
+      
       const response = await fetch('/api/admin/activate', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token}`
+        },
         body: JSON.stringify({ userId, paymentId }),
       })
 
