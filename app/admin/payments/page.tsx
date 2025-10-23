@@ -52,14 +52,27 @@ export default function AdminPaymentsPage() {
       // Get session token
       const { data: { session } } = await supabase.auth.getSession()
       
+      if (!session?.access_token) {
+        console.error('No session token available')
+        setLoading(false)
+        return
+      }
+
+      console.log('🔑 Fetching payments with token for:', user?.email)
+      
       const response = await fetch('/api/admin/payments', {
         headers: {
-          'Authorization': `Bearer ${session?.access_token}`
+          'Authorization': `Bearer ${session.access_token}`
         }
       })
       const data = await response.json()
+      
+      console.log('📊 Admin payments response:', data)
+      
       if (data.success) {
         setPayments(data.payments || [])
+      } else {
+        console.error('Failed to fetch payments:', data.error)
       }
     } catch (error) {
       console.error('Error fetching payments:', error)
@@ -78,11 +91,17 @@ export default function AdminPaymentsPage() {
       // Get session token
       const { data: { session } } = await supabase.auth.getSession()
       
+      if (!session?.access_token) {
+        alert('❌ Session expired. Please refresh the page.')
+        setActivating(null)
+        return
+      }
+      
       const response = await fetch('/api/admin/activate', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session?.access_token}`
+          'Authorization': `Bearer ${session.access_token}`
         },
         body: JSON.stringify({ userId, paymentId }),
       })
@@ -103,8 +122,12 @@ export default function AdminPaymentsPage() {
   }
 
   useEffect(() => {
-    fetchPayments()
-  }, [])
+    // Only fetch payments after user is verified as admin
+    if (!authLoading && isAdmin) {
+      fetchPayments()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authLoading, isAdmin])
 
   const getStatusColor = (status: string) => {
     switch (status) {
