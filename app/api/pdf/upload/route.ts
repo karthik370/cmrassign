@@ -47,6 +47,24 @@ export async function POST(request: NextRequest) {
         } as any)
     }
 
+    // Check if user has active subscription
+    const { data: subscription } = await (supabaseAdmin as any)
+      .from('user_subscriptions')
+      .select('*')
+      .eq('user_id', user.id)
+      .single()
+
+    if (!subscription || !subscription.is_active) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: 'Payment required. Please complete payment to create projects.',
+          requiresPayment: true
+        },
+        { status: 403 }
+      )
+    }
+
     // Parse form data
     const formData = await request.formData()
     const file = formData.get('file') as File

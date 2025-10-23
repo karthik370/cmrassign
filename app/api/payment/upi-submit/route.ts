@@ -70,6 +70,25 @@ export async function POST(request: NextRequest) {
       }, { status: 500 })
     }
 
+    // Create or update user subscription record (inactive, pending payment)
+    // @ts-ignore
+    const { error: subError } = await supabaseAdmin
+      .from('user_subscriptions')
+      .upsert({
+        user_id: user.id,
+        is_active: false,
+        payment_status: 'pending',
+        amount_paid: amount || 30,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      } as any, {
+        onConflict: 'user_id'
+      })
+
+    if (subError) {
+      console.error('❌ Failed to create subscription record:', subError)
+    }
+
     console.log('✅ UPI payment submitted with UTR:', utrNumber)
 
     return NextResponse.json({

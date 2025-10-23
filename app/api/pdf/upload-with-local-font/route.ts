@@ -20,6 +20,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // Check if user has active subscription
+    const { data: subscription } = await (supabaseAdmin as any)
+      .from('user_subscriptions')
+      .select('*')
+      .eq('user_id', user.id)
+      .single()
+
+    if (!subscription || !subscription.is_active) {
+      return NextResponse.json({ 
+        error: 'Payment required. Please complete payment to create projects.',
+        requiresPayment: true
+      }, { status: 403 })
+    }
+
     // Check project limit (5 projects max for all users)
     const { count: projectCount } = await (supabaseAdmin as any)
       .from('projects')
