@@ -1,0 +1,44 @@
+{
+  "name": "handwriting-pdf-generator",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@pdf-lib/fontkit": "^1.1.1",
+    "@supabase/auth-helpers-nextjs": "^0.8.7",
+    "@supabase/supabase-js": "^2.39.0",
+    "autoprefixer": "^10.4.17",
+    "axios": "^1.6.5",
+    "cloudinary": "^2.0.0",
+    "clsx": "^2.1.0",
+    "date-fns": "^3.0.0",
+    "formidable": "^3.5.1",
+    "lucide-react": "^0.263.1",
+    "next": "^14.2.0",
+    "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^4.0.379",
+    "postcss": "^8.4.33",
+    "razorpay": "^2.9.6",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "react-pdf": "^7.7.0",
+    "tailwind-merge": "^2.2.0",
+    "tailwindcss": "^3.4.0",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/formidable": "^3.4.5",
+    "@types/node": "^20.11.0",
+    "@types/react": "^18.2.48",
+    "@types/react-dom": "^18.2.18",
+    "eslint": "^8.56.0",
+    "eslint-config-next": "14.2.0",
+    "typescript": "^5.3.3"
+  }
+}
