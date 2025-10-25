@@ -85,7 +85,7 @@ export const LoginForm = () => {
           </Link>
         </p>
         <Link
-          href="/auth/reset-password"
+          href="/auth/forgot-password"
           className="text-sm text-primary-600 hover:underline block"
         >
           Forgot password?
