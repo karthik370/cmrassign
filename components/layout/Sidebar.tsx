@@ -1,8 +1,9 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, FileText, Type, BookOpen } from 'lucide-react'
+import { Home, FileText, Type, BookOpen, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const navigation = [
@@ -14,9 +15,10 @@ const navigation = [
 
 export const Sidebar = () => {
   const pathname = usePathname()
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
-  return (
-    <aside className="w-64 min-h-screen relative overflow-hidden">
+  const sidebarContent = () => (
+    <>
       {/* Glassmorphism background with animated gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-gray-900/95 via-purple-900/90 to-blue-900/95 backdrop-blur-xl" />
       
@@ -24,13 +26,22 @@ export const Sidebar = () => {
       <div className="absolute top-20 -left-20 w-40 h-40 bg-purple-500/30 rounded-full blur-3xl animate-pulse" />
       <div className="absolute bottom-20 -right-20 w-40 h-40 bg-blue-500/30 rounded-full blur-3xl animate-pulse delay-1000" />
       
-      <nav className="relative p-4 space-y-2">
+      {/* Close button for mobile */}
+      <button
+        onClick={() => setIsMobileMenuOpen(false)}
+        className="lg:hidden absolute top-4 right-4 z-50 p-2 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 transition-all"
+      >
+        <X size={24} />
+      </button>
+      
+      <nav className="relative p-4 space-y-2 pt-16 lg:pt-4">
         {navigation.map((item) => {
           const isActive = pathname === item.href
           return (
             <Link
               key={item.name}
               href={item.href}
+              onClick={() => setIsMobileMenuOpen(false)}
               className={cn(
                 'flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative overflow-hidden',
                 isActive
@@ -78,6 +89,41 @@ export const Sidebar = () => {
           <div className="text-gray-400">CMR Assignment v1.0</div>
         </div>
       </div>
-    </aside>
+    </>
+  )
+
+  return (
+    <>
+      {/* Desktop Sidebar */}
+      <aside className="hidden lg:block w-64 min-h-screen relative overflow-hidden">
+        {sidebarContent()}
+      </aside>
+
+      {/* Mobile Sidebar (Overlay) */}
+      {isMobileMenuOpen && (
+        <>
+          {/* Backdrop */}
+          <div 
+            className="lg:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+          
+          {/* Sidebar */}
+          <aside className="lg:hidden fixed top-0 left-0 w-64 h-screen relative overflow-hidden z-50">
+            {sidebarContent()}
+          </aside>
+        </>
+      )}
+
+      {/* Mobile Menu Button */}
+      <button
+        onClick={() => setIsMobileMenuOpen(true)}
+        className="lg:hidden fixed bottom-6 right-6 z-30 p-4 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 text-white shadow-lg shadow-purple-500/50 hover:scale-110 transition-transform"
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+    </>
   )
 }

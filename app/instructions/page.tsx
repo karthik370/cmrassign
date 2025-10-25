@@ -17,28 +17,28 @@ export default function InstructionsPage() {
       <Header />
       <div className="flex flex-1">
         <Sidebar />
-        <main className="flex-1 p-8 relative">
+        <main className="flex-1 p-4 sm:p-6 md:p-8 relative">
           <div className="max-w-4xl mx-auto">
             {/* Glass header */}
-            <div className="mb-8 p-6 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20 shadow-2xl">
-              <h1 className="text-4xl font-bold text-white mb-3 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+            <div className="mb-6 md:mb-8 p-4 md:p-6 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20 shadow-2xl">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
                 How to Create Your Handwriting Font (FREE)
               </h1>
-              <p className="text-white text-lg">
+              <p className="text-gray-300 text-sm md:text-base lg:text-lg">
                 Follow these simple steps to create your custom handwriting font using Calligraphr.com
               </p>
             </div>
 
             {/* Steps */}
-            <div className="space-y-6">
+            <div className="space-y-4 md:space-y-6">
               {/* Step 1 */}
-              <div className="group p-6 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-102 shadow-xl">
+              <div className="group p-4 md:p-6 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-102 shadow-xl">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0 shadow-lg shadow-purple-500/50 group-hover:scale-110 transition-transform duration-300">
+                  <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0 shadow-lg shadow-purple-500/50 group-hover:scale-110 transition-transform duration-300">
                     1
                   </div>
                   <div className="flex-1">
-                    <h2 className="text-2xl font-bold text-white mb-3">
+                    <h2 className="text-xl md:text-2xl font-bold text-white mb-3">
                       Go to Calligraphr.com
                     </h2>
                     <p className="text-white mb-4">
@@ -58,13 +58,13 @@ export default function InstructionsPage() {
               </div>
 
               {/* Step 2 */}
-              <div className="group p-6 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-102 shadow-xl">
+              <div className="group p-4 md:p-6 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-102 shadow-xl">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0 shadow-lg shadow-blue-500/50 group-hover:scale-110 transition-transform duration-300">
                     2
                   </div>
                   <div className="flex-1">
-                    <h2 className="text-2xl font-bold text-white mb-3">
+                    <h2 className="text-xl md:text-2xl font-bold text-white mb-3">
                       Download Template
                     </h2>
                     <ul className="text-white space-y-2 mb-4">
@@ -95,13 +95,13 @@ export default function InstructionsPage() {
               </div>
 
               {/* Step 3 */}
-              <div className="group p-6 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-102 shadow-xl">
+              <div className="group p-4 md:p-6 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-102 shadow-xl">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0 shadow-lg shadow-green-500/50 group-hover:scale-110 transition-transform duration-300">
                     3
                   </div>
                   <div className="flex-1">
-                    <h2 className="text-2xl font-bold text-white mb-3">
+                    <h2 className="text-xl md:text-2xl font-bold text-white mb-3">
                       Fill the Template
                     </h2>
                     <p className="text-white mb-3">Choose one of these methods:</p>
@@ -135,13 +135,13 @@ export default function InstructionsPage() {
               </div>
 
               {/* Step 4 */}
-              <div className="group p-6 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-102 shadow-xl">
+              <div className="group p-4 md:p-6 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-102 shadow-xl">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0 shadow-lg shadow-orange-500/50 group-hover:scale-110 transition-transform duration-300">
                     4
                   </div>
                   <div className="flex-1">
-                    <h2 className="text-2xl font-bold text-white mb-3">
+                    <h2 className="text-xl md:text-2xl font-bold text-white mb-3">
                       Upload to Calligraphr
                     </h2>
                     <ul className="text-white space-y-2 mb-4">
@@ -167,13 +167,13 @@ export default function InstructionsPage() {
               </div>
 
               {/* Step 5 */}
-              <div className="group p-6 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-102 shadow-xl">
+              <div className="group p-4 md:p-6 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-102 shadow-xl">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-pink-600 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0 shadow-lg shadow-pink-500/50 group-hover:scale-110 transition-transform duration-300">
                     5
                   </div>
                   <div className="flex-1">
-                    <h2 className="text-2xl font-bold text-white mb-3">
+                    <h2 className="text-xl md:text-2xl font-bold text-white mb-3">
                       Download Your Font
                     </h2>
                     <p className="text-white mb-4">
@@ -192,7 +192,7 @@ export default function InstructionsPage() {
             </div>
 
             {/* FAQ */}
-            <div className="mt-12 p-6 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20 shadow-2xl">
+            <div className="mt-8 md:mt-12 p-4 md:p-6 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20 shadow-2xl">
               <h2 className="text-3xl font-bold text-white mb-6 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
                 Frequently Asked Questions
               </h2>

@@ -28,24 +28,24 @@ export default function DashboardPage() {
         <Header />
         <div className="flex flex-1">
           <Sidebar />
-          <main className="flex-1 p-8 relative">
+          <main className="flex-1 p-4 sm:p-6 md:p-8 relative">
             <div className="max-w-6xl mx-auto">
               {/* Glass header */}
-              <div className="mb-8 p-6 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20 shadow-2xl">
-                <h1 className="text-4xl font-bold text-white mb-2 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+              <div className="mb-6 md:mb-8 p-4 md:p-6 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20 shadow-2xl">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
                   Dashboard
                 </h1>
-                <p className="text-gray-300">
+                <p className="text-sm md:text-base text-gray-300">
                   Welcome back! Here's an overview of your account.
                 </p>
               </div>
 
               {/* Stats - Glassmorphism */}
-              <div className="grid md:grid-cols-3 gap-6 mb-8">
-                <div className="group p-6 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/50">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
+                <div className="group p-4 md:p-6 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/50">
                   <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/50 group-hover:scale-110 transition-transform duration-300">
-                      <Type className="text-white" size={28} />
+                    <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/50 group-hover:scale-110 transition-transform duration-300">
+                      <Type className="text-white" size={20} />
                     </div>
                     <div>
                       <p className="text-3xl font-bold text-white mb-1">
@@ -89,11 +89,11 @@ export default function DashboardPage() {
               </div>
 
               {/* Quick Actions - Glassmorphism */}
-              <div className="p-6 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20 shadow-2xl mb-8">
-                <h2 className="text-2xl font-bold text-white mb-6">
+              <div className="p-4 md:p-6 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20 shadow-2xl mb-6 md:mb-8">
+                <h2 className="text-xl md:text-2xl font-bold text-white mb-4 md:mb-6">
                   Quick Actions
                 </h2>
-                <div className="grid md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                   <Link href="/instructions">
                     <Button className="w-full h-14 bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 hover:scale-105 transition-all duration-300 shadow-lg">
                       <BookOpen size={20} className="mr-2" />
@@ -128,7 +128,7 @@ export default function DashboardPage() {
               </div>
 
               {/* Recent Projects - Glassmorphism */}
-              <div className="p-6 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20 shadow-2xl">
+              <div className="p-4 md:p-6 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20 shadow-2xl">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-2xl font-bold text-white">
                     Recent Projects

@@ -20,20 +20,20 @@ export default function FontsPage() {
         <Header />
         <div className="flex flex-1">
           <Sidebar />
-          <main className="flex-1 p-8 relative">
+          <main className="flex-1 p-4 sm:p-6 md:p-8 relative">
             <div className="max-w-6xl mx-auto">
               {/* Glass header */}
-              <div className="flex justify-between items-center mb-8 p-6 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20 shadow-2xl">
+              <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6 md:mb-8 p-4 md:p-6 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20 shadow-2xl">
                 <div>
-                  <h1 className="text-4xl font-bold text-white mb-2 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                  <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
                     My Fonts
                   </h1>
-                  <p className="text-gray-300">
+                  <p className="text-sm md:text-base text-gray-300">
                     Manage your handwriting fonts
                   </p>
                 </div>
                 <Link href="/fonts/upload">
-                  <Button className="bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:from-purple-600 hover:to-blue-600 hover:scale-105 transition-all duration-300 shadow-lg shadow-purple-500/50 font-semibold h-12 px-6">
+                  <Button className="w-full sm:w-auto bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:from-purple-600 hover:to-blue-600 hover:scale-105 transition-all duration-300 shadow-lg shadow-purple-500/50 font-semibold h-12 px-6">
                     <Plus size={20} className="mr-2" />
                     Upload Font
                   </Button>
