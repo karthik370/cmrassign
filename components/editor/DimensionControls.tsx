@@ -8,9 +8,9 @@ interface DimensionControlsProps {
 
 const DEFAULT_DIMENSIONS: PageDimensions = {
   lineBoxHeight: 30.5,
-  lineSpacing: 23,
+  lineSpacing: 24.6,
   marginLeft: 40,
-  marginRight: -125,
+  marginRight: -220,
   marginTop: 93,
 }
 

@@ -22,9 +22,9 @@ import axios from 'axios'
 
 const DEFAULT_DIMENSIONS: PageDimensions = {
   lineBoxHeight: 30.5,
-  lineSpacing: 23,
+  lineSpacing: 24.6,
   marginLeft: 40,
-  marginRight: -125,
+  marginRight: -220,
   marginTop: 93,
 }
 
@@ -58,7 +58,40 @@ export const PDFEditor = ({ project, font, pageEdits: initialPageEdits }: PDFEdi
   const [overflowData, setOverflowData] = useState<{ page: number; overflowLines: string[]; totalLines: number } | null>(null)
   const [showLeftSidebar, setShowLeftSidebar] = useState(true)
   const [showRightSidebar, setShowRightSidebar] = useState(true)
-  const [manuallyEditedPages, setManuallyEditedPages] = useState<Set<number>>(new Set())
+  const [visitedPages, setVisitedPages] = useState<Set<number>>(new Set([1])) // Track which pages user has visited (start with page 1)
+  const [isMobile, setIsMobile] = useState(false)
+
+  // Detect mobile on mount and window resize
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile = window.innerWidth < 768
+      const wasMobile = isMobile
+      setIsMobile(mobile)
+      
+      // On first load, hide sidebars if mobile
+      if (mobile && !wasMobile && showLeftSidebar && showRightSidebar) {
+        setShowLeftSidebar(false)
+        setShowRightSidebar(false)
+      }
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Mark current page as visited when user navigates to it
+  useEffect(() => {
+    setVisitedPages(prev => {
+      const newSet = new Set(prev)
+      newSet.add(currentPage)
+      if (!prev.has(currentPage)) {
+        console.log(`👁️ Page ${currentPage} marked as VISITED - auto-overflow will stop for this page`)
+      }
+      return newSet
+    })
+  }, [currentPage])
 
   // Load fontSize, fontWeight and inkColor from current page data
   useEffect(() => {
@@ -212,7 +245,13 @@ export const PDFEditor = ({ project, font, pageEdits: initialPageEdits }: PDFEdi
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
   const [saveError, setSaveError] = useState<string | null>(null)
 
-  // Handle overflow - sync next page with overflow text ONLY ONCE (not if manually edited)
+  // Handle overflow - sync next page with overflow text UNTIL user visits the next page
+  // BEHAVIOR:
+  // - Text overflow from Page 1 auto-updates Page 2 continuously
+  // - This continues as long as user stays on Page 1
+  // - Once user clicks "Next" and visits Page 2, auto-overflow STOPS
+  // - If user goes back to Page 1 and edits, Page 2 is NOT updated anymore
+  // - This prevents overwriting user's manual edits on the next page
   useEffect(() => {
     if (!actualPageCount) return
     
@@ -221,9 +260,9 @@ export const PDFEditor = ({ project, font, pageEdits: initialPageEdits }: PDFEdi
     
     const nextPageEdit = pageEdits[nextPage]
     
-    // CHECK: Has the next page been manually edited? If yes, DON'T auto-sync
-    if (manuallyEditedPages.has(nextPage)) {
-      console.log(`🚫 Page ${nextPage} was manually edited - skipping auto-sync`)
+    // CHECK: Has the user visited the next page? If yes, DON'T auto-sync anymore
+    if (visitedPages.has(nextPage)) {
+      console.log(`🚫 Page ${nextPage} was already visited - skipping auto-overflow`)
       return
     }
     
@@ -234,7 +273,7 @@ export const PDFEditor = ({ project, font, pageEdits: initialPageEdits }: PDFEdi
       
       // Update next page if overflow text is different
       if (currentNextPageText !== overflowText) {
-        console.log(`📝 AUTO-SYNC (ONCE): Syncing page ${nextPage} with ${overflowData.overflowLines.length} overflow lines`)
+        console.log(`📝 AUTO-OVERFLOW: Updating page ${nextPage} with ${overflowData.overflowLines.length} overflow lines (will stop when user visits page ${nextPage})`)
         
         setPageEdits(prev => ({
           ...prev,
@@ -252,7 +291,7 @@ export const PDFEditor = ({ project, font, pageEdits: initialPageEdits }: PDFEdi
         }))
       }
     }
-  }, [overflowData, currentPage, actualPageCount, fontSize, inkColor, pageEdits, manuallyEditedPages])
+  }, [overflowData, currentPage, actualPageCount, fontSize, inkColor, pageEdits, visitedPages])
   
   // Clear overflow data when navigating away from overflow pages or when overflow is resolved
   useEffect(() => {
@@ -264,15 +303,11 @@ export const PDFEditor = ({ project, font, pageEdits: initialPageEdits }: PDFEdi
       setOverflowData(null)
     }
     
-    // Clear if overflow was resolved (next page was manually edited or overflow is gone)
+    // Clear if user navigated to the next page (overflow is now "locked")
     if (currentPage === overflowData.page + 1) {
-      const nextPageText = pageEdits[currentPage]?.text_content?.[0]?.text || ''
-      const expectedOverflow = overflowData.overflowLines.join('\n')
-      // If user manually edited the next page with different content, clear overflow tracking
-      if (nextPageText && nextPageText !== expectedOverflow && !nextPageText.startsWith(expectedOverflow.split('\n')[0] || '')) {
-        console.log('📝 Next page was manually edited, clearing overflow tracking')
-        setOverflowData(null)
-      }
+      // User has visited the next page, so overflow is locked - clear tracking
+      console.log('📝 User visited next page, overflow is now locked')
+      setOverflowData(null)
     }
   }, [currentPage, pageEdits, overflowData])
 
@@ -539,76 +574,100 @@ export const PDFEditor = ({ project, font, pageEdits: initialPageEdits }: PDFEdi
   }
 
   return (
-    <div className="flex flex-col h-screen">
-      {/* Header */}
-      <div className="bg-white border-b px-6 py-3 flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-gray-900">{project.name}</h1>
-          <p className="text-sm text-gray-500">Font: {font.name} | Pages: {actualPageCount || 1}</p>
-        </div>
-        <div className="flex items-center gap-3">
-          {isSaving && (
-            <span className="text-sm text-gray-500 flex items-center gap-2">
-              <Loader2 className="animate-spin" size={16} />
-              Saving...
-            </span>
-          )}
-          {lastSaved && !isSaving && (
-            <span className="text-sm text-green-600">
-              Saved {new Date(lastSaved).toLocaleTimeString()}
-            </span>
-          )}
-          {saveError && (
-            <span className="text-sm text-red-600">Save failed</span>
-          )}
+    <div className="flex flex-col h-screen bg-gray-50">
+      {/* Header - Responsive */}
+      <div className="bg-white border-b p-3 md:p-4 shadow-sm flex-shrink-0">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 md:gap-4">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-lg md:text-xl font-bold text-gray-900 truncate">{project.name}</h1>
+            <p className="text-xs md:text-sm text-gray-600">
+              {isSaving ? 'Saving...' : lastSaved ? `Saved ${lastSaved.toLocaleTimeString()}` : 'Not saved yet'}
+              {saveError && <span className="text-red-600 ml-2">{saveError}</span>}
+            </p>
+          </div>
           
-          {/* Show manual download button if PDF was generated */}
-          {generatedPdfUrl && (
-            <a
-              href={generatedPdfUrl}
-              download={`${project.name}_handwritten.pdf`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
-            >
-              <Download size={18} className="mr-2" />
-              Download PDF
-            </a>
-          )}
-          
-          <Button
-            variant="primary"
-            onClick={handleGeneratePDF}
-            isLoading={isGenerating}
-            disabled={isGenerating}
-          >
-            {isGenerating ? (
-              <>
-                <Loader2 className="animate-spin mr-2" size={18} />
-                Generating PDF...
-              </>
-            ) : (
-              <>
-                <Download size={18} className="mr-2" />
-                {generatedPdfUrl ? 'Regenerate PDF' : 'Generate PDF'}
-              </>
+          <div className="flex items-center gap-2">
+            {generatedPdfUrl && (
+              <a
+                href={generatedPdfUrl}
+                download={`${project.name}.pdf`}
+                className="flex-1 md:flex-none px-3 md:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold shadow-md hover:shadow-lg text-sm md:text-base text-center"
+              >
+                <Download size={16} className="inline mr-1 md:mr-2" />
+                <span className="hidden sm:inline">Download</span>
+                <span className="sm:hidden">PDF</span>
+              </a>
             )}
-          </Button>
+            
+            <Button
+              variant="primary"
+              onClick={handleGeneratePDF}
+              isLoading={isGenerating}
+              disabled={isGenerating}
+              className="flex-1 md:flex-none text-sm md:text-base"
+            >
+              {isGenerating ? (
+                <>
+                  <Loader2 className="animate-spin mr-1 md:mr-2" size={16} />
+                  <span className="hidden sm:inline">Generating...</span>
+                  <span className="sm:hidden">Gen...</span>
+                </>
+              ) : (
+                <>
+                  <Download size={16} className="mr-1 md:mr-2" />
+                  <span className="hidden sm:inline">{generatedPdfUrl ? 'Regenerate' : 'Generate'}</span>
+                  <span className="sm:hidden">Gen</span>
+                </>
+              )}
+            </Button>
+          </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* Left Sidebar - Page Thumbnails (Collapsible) */}
+      <div className="flex flex-1 overflow-hidden relative">
+        {/* Left Sidebar - Page Thumbnails (Mobile Overlay / Desktop Fixed) */}
         {showLeftSidebar && (
-          <div className="w-48 border-r bg-white flex-shrink-0">
-            <PageThumbnails
-              totalPages={actualPageCount || 1}
-              currentPage={currentPage}
-              filledPages={filledPages}
-              onPageSelect={setCurrentPage}
-            />
-          </div>
+          <>
+            {/* Mobile backdrop */}
+            {isMobile && (
+              <div 
+                className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+                onClick={() => setShowLeftSidebar(false)}
+              />
+            )}
+            {/* Sidebar */}
+            <div className={`
+              ${isMobile ? 'fixed left-0 top-0 bottom-0 z-50' : 'relative border-r'}
+              w-64 md:w-48 bg-white flex-shrink-0 shadow-2xl md:shadow-none
+            `}>
+              <div className="h-full flex flex-col">
+                {/* Mobile header */}
+                {isMobile && (
+                  <div className="flex items-center justify-between p-4 border-b">
+                    <h2 className="font-semibold text-gray-900">Pages</h2>
+                    <button
+                      onClick={() => setShowLeftSidebar(false)}
+                      className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                )}
+                <div className="flex-1 overflow-hidden">
+                  <PageThumbnails
+                    totalPages={actualPageCount || 1}
+                    currentPage={currentPage}
+                    filledPages={filledPages}
+                    onPageSelect={(page) => {
+                      setCurrentPage(page)
+                      if (isMobile) setShowLeftSidebar(false)
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          </>
         )}
 
         {/* Center - Text to Handwriting Canvas */}
@@ -687,10 +746,6 @@ export const PDFEditor = ({ project, font, pageEdits: initialPageEdits }: PDFEdi
             showOverflowFrom={undefined}
             onTextChange={(text) => {
               if (currentPageEdit) {
-                // Mark this page as manually edited to prevent auto-overflow overwriting
-                setManuallyEditedPages(prev => new Set(prev).add(currentPage))
-                console.log(`✏️ Page ${currentPage} marked as manually edited`)
-                
                 const updatedEdit: PageEdit = {
                   ...currentPageEdit,
                   text_content: [{ id: 'main', text, x: 0, y: 0, width: 0, height: 0, fontSize, fontWeight, letterSpacing, color: inkColor }],
@@ -717,10 +772,26 @@ export const PDFEditor = ({ project, font, pageEdits: initialPageEdits }: PDFEdi
             }}
           />
           
-          {/* Toggle Buttons - Floating */}
+          {/* Mobile Toggle Buttons - Floating Bottom */}
+          <div className="fixed bottom-20 left-0 right-0 z-30 flex justify-center gap-3 px-4 md:hidden pointer-events-none">
+            <button
+              onClick={() => setShowLeftSidebar(!showLeftSidebar)}
+              className="pointer-events-auto bg-black text-green-400 border-2 border-green-500 rounded-full px-4 py-3 shadow-2xl hover:bg-gray-900 transition-all font-mono text-sm font-bold"
+            >
+              📄 Pages
+            </button>
+            <button
+              onClick={() => setShowRightSidebar(!showRightSidebar)}
+              className="pointer-events-auto bg-black text-green-400 border-2 border-green-500 rounded-full px-4 py-3 shadow-2xl hover:bg-gray-900 transition-all font-mono text-sm font-bold"
+            >
+              🛠️ Tools
+            </button>
+          </div>
+          
+          {/* Desktop Toggle Buttons - Floating Top */}
           <button
             onClick={() => setShowLeftSidebar(!showLeftSidebar)}
-            className="absolute top-4 left-4 z-10 bg-white border-2 border-gray-300 rounded-lg p-2 shadow-lg hover:bg-gray-50 transition-colors"
+            className="hidden md:block absolute top-4 left-4 z-10 bg-white border-2 border-gray-300 rounded-lg p-2 shadow-lg hover:bg-gray-50 transition-colors"
             title={showLeftSidebar ? "Hide pages" : "Show pages"}
           >
             {showLeftSidebar ? (
@@ -732,7 +803,7 @@ export const PDFEditor = ({ project, font, pageEdits: initialPageEdits }: PDFEdi
           
           <button
             onClick={() => setShowRightSidebar(!showRightSidebar)}
-            className="absolute top-4 right-4 z-10 bg-white border-2 border-gray-300 rounded-lg p-2 shadow-lg hover:bg-gray-50 transition-colors"
+            className="hidden md:block absolute top-4 right-4 z-10 bg-white border-2 border-gray-300 rounded-lg p-2 shadow-lg hover:bg-gray-50 transition-colors"
             title={showRightSidebar ? "Hide tools" : "Show tools"}
           >
             {showRightSidebar ? (
@@ -743,14 +814,42 @@ export const PDFEditor = ({ project, font, pageEdits: initialPageEdits }: PDFEdi
           </button>
         </div>
 
-        {/* Right Sidebar - Tools (Collapsible) */}
+        {/* Right Sidebar - Tools (Mobile Overlay / Desktop Fixed) */}
         {showRightSidebar && (
-          <div className="w-72 bg-white border-l p-4 overflow-y-auto space-y-4 flex-shrink-0">
-            <h2 className="text-base font-semibold text-gray-900 mb-3">
-              Tools
-            </h2>
+          <>
+            {/* Mobile backdrop */}
+            {isMobile && (
+              <div 
+                className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+                onClick={() => setShowRightSidebar(false)}
+              />
+            )}
+            {/* Sidebar */}
+            <div className={`
+              ${isMobile ? 'fixed right-0 top-0 bottom-0 z-50' : 'relative border-l'}
+              w-full md:w-72 bg-white flex-shrink-0 shadow-2xl md:shadow-none
+            `}>
+              <div className="h-full flex flex-col">
+                {/* Mobile header */}
+                {isMobile && (
+                  <div className="flex items-center justify-between p-4 border-b">
+                    <h2 className="font-semibold text-gray-900">Tools</h2>
+                    <button
+                      onClick={() => setShowRightSidebar(false)}
+                      className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                )}
+                <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                  {!isMobile && (
+                    <h2 className="text-base font-semibold text-gray-900 mb-3">
+                      Tools
+                    </h2>
+                  )}
 
-            <div className="space-y-4">
+                  <div className="space-y-4">
               {/* Drawing Mode Toggle */}
               <div className={`border-2 rounded-lg p-4 ${showDrawingCanvas ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-400' : 'bg-gradient-to-r from-purple-50 to-pink-50 border-purple-300'}`}>
                 <h3 className={`text-sm font-semibold mb-2 flex items-center gap-2 ${showDrawingCanvas ? 'text-green-900' : 'text-purple-900'}`}>
@@ -796,8 +895,11 @@ export const PDFEditor = ({ project, font, pageEdits: initialPageEdits }: PDFEdi
                 dimensions={currentPageEdit?.dimensions || DEFAULT_DIMENSIONS}
                 onChange={handleDimensionsChange}
               />
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
+          </>
         )}
       </div>
 

@@ -202,6 +202,13 @@ export async function POST(request: NextRequest) {
         })),
         detected_areas: { lines: textLines },
         ink_color: 'black',
+        dimensions: {
+          lineBoxHeight: 30.5,
+          lineSpacing: 24.6,
+          marginLeft: 40,
+          marginRight: -220,
+          marginTop: 93,
+        },
       })
     }
 

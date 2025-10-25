@@ -11,19 +11,32 @@ export const usePayment = () => {
   const [subscription, setSubscription] = useState<any>(null)
 
   useEffect(() => {
-    if (user) {
-      checkPaymentStatus()
-      
-      // Poll payment status every 10 seconds to detect admin activations
-      const interval = setInterval(() => {
-        checkPaymentStatus()
-      }, 10000) // Check every 10 seconds
-      
-      return () => clearInterval(interval)
-    } else {
-      setLoading(false)
-      setHasAccess(false)
+    const initPaymentCheck = async () => {
+      if (user) {
+        // Check cached status first for instant access
+        const cached = localStorage.getItem('payment_status')
+        if (cached) {
+          try {
+            const cachedData = JSON.parse(cached)
+            setHasAccess(cachedData.hasAccess)
+            setSubscription(cachedData.subscription)
+            setLoading(false) // Stop loading immediately if we have cached data
+          } catch (e) {
+            console.error('Failed to parse cached payment status:', e)
+          }
+        }
+        
+        // Then verify in background (once)
+        await checkPaymentStatus()
+      } else {
+        setLoading(false)
+        setHasAccess(false)
+        localStorage.removeItem('payment_status')
+      }
     }
+    
+    initPaymentCheck()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user])
 
   const checkPaymentStatus = async () => {
@@ -46,6 +59,13 @@ export const usePayment = () => {
       if (data.success) {
         setHasAccess(data.hasAccess)
         setSubscription(data.subscription)
+        
+        // Cache the payment status for instant access next time
+        localStorage.setItem('payment_status', JSON.stringify({
+          hasAccess: data.hasAccess,
+          subscription: data.subscription,
+          timestamp: Date.now()
+        }))
       }
     } catch (error) {
       console.error('Failed to check payment status:', error)
@@ -97,6 +117,8 @@ export const usePayment = () => {
       const data = await response.json()
       
       if (data.success && data.verified) {
+        // Clear cache to force fresh check
+        localStorage.removeItem('payment_status')
         // Refresh payment status
         await checkPaymentStatus()
       }

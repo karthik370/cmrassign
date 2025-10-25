@@ -47,7 +47,8 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     }
   }
 
-  if (loading) {
+  if (loading && !user) {
+    // Only show loading if we don't have cached user data
     console.log('ProtectedRoute: Loading...')
     return <Loading fullScreen text="Loading..." />
   }

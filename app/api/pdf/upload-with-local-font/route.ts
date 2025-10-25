@@ -136,13 +136,20 @@ export async function POST(request: NextRequest) {
 
     console.log('✅ Project created:', project.id)
 
-    // Create empty page edits for each page
+    // Create empty page edits for each page with default dimensions
     const pageEdits = Array.from({ length: pdfInfo.pageCount }, (_, i) => ({
       project_id: project.id,
       page_number: i + 1,
       text_content: [{ id: 'main', text: '', x: 0, y: 0, width: 0, height: 0, fontSize: 24, color: 'black' }],
       detected_areas: null,
       ink_color: 'black',
+      dimensions: {
+        lineBoxHeight: 30.5,
+        lineSpacing: 24.6,
+        marginLeft: 40,
+        marginRight: -220,
+        marginTop: 93,
+      },
     }))
 
     await (supabaseAdmin as any).from('page_edits').insert(pageEdits)

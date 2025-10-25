@@ -12,14 +12,25 @@ export const useProjects = () => {
 
   const fetchProjects = async () => {
     try {
-      setLoading(true)
+      // If we have cached data, show it instantly
+      const cached = localStorage.getItem('projects_cache')
+      if (cached) {
+        try {
+          const cachedData = JSON.parse(cached)
+          setProjects(cachedData.projects || [])
+          setLoading(false) // Stop loading immediately
+        } catch (e) {
+          console.error('Failed to parse cached projects:', e)
+        }
+      }
       
-      // Get the current session to send with request
+      // Then fetch fresh data in background
       const { data: { session } } = await supabase.auth.getSession()
       
       if (!session) {
         setError('Not authenticated')
         setProjects([])
+        localStorage.removeItem('projects_cache')
         return
       }
       
@@ -30,6 +41,12 @@ export const useProjects = () => {
       })
       setProjects(response.data)
       setError(null)
+      
+      // Update cache
+      localStorage.setItem('projects_cache', JSON.stringify({
+        projects: response.data,
+        timestamp: Date.now()
+      }))
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to fetch projects')
     } finally {
@@ -39,6 +56,7 @@ export const useProjects = () => {
 
   useEffect(() => {
     fetchProjects()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const createProject = async (

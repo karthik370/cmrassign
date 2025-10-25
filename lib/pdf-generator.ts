@@ -126,9 +126,9 @@ export const generatePDFWithHandwriting = async (
       // Text positioning settings (use saved page-specific dimensions or defaults)
       const dimensions = pageEdit.dimensions || {
         lineBoxHeight: 30.5,
-        lineSpacing: 23,
+        lineSpacing: 24.6,
         marginLeft: 40,
-        marginRight: -125,
+        marginRight: -220,
         marginTop: 93,
       }
       

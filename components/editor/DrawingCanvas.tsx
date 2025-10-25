@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useRef, useState, useEffect } from 'react'
-import { Pen, Eraser, Minus, RotateCcw, RotateCw, Trash2 } from 'lucide-react'
+import { Pen, Eraser, Minus, RotateCcw, RotateCw, Trash2, Move } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 
 type DrawingTool = 'pen' | 'eraser' | 'line'
@@ -41,6 +41,11 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
   const [currentStroke, setCurrentStroke] = useState<Point[]>([])
   const [undoStack, setUndoStack] = useState<DrawingStroke[][]>([])
   const [redoStack, setRedoStack] = useState<DrawingStroke[][]>([])
+  
+  // Draggable toolbar state
+  const [toolbarPosition, setToolbarPosition] = useState({ x: 8, y: 8 })
+  const [isDraggingToolbar, setIsDraggingToolbar] = useState(false)
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
 
   // Load initial drawing
   useEffect(() => {
@@ -232,10 +237,64 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
     }
   }
 
+  // Toolbar drag handlers
+  const handleToolbarMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDraggingToolbar(true)
+    setDragOffset({
+      x: e.clientX - toolbarPosition.x,
+      y: e.clientY - toolbarPosition.y
+    })
+  }
+
+  const handleToolbarMouseMove = (e: MouseEvent) => {
+    if (!isDraggingToolbar) return
+    e.preventDefault()
+    setToolbarPosition({
+      x: e.clientX - dragOffset.x,
+      y: e.clientY - dragOffset.y
+    })
+  }
+
+  const handleToolbarMouseUp = () => {
+    setIsDraggingToolbar(false)
+  }
+
+  // Add/remove toolbar drag listeners
+  useEffect(() => {
+    if (isDraggingToolbar) {
+      window.addEventListener('mousemove', handleToolbarMouseMove)
+      window.addEventListener('mouseup', handleToolbarMouseUp)
+      return () => {
+        window.removeEventListener('mousemove', handleToolbarMouseMove)
+        window.removeEventListener('mouseup', handleToolbarMouseUp)
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isDraggingToolbar])
+
   return (
     <div className="relative">
       {/* Drawing Tools */}
-      <div className="absolute top-2 left-2 bg-white rounded-lg shadow-lg p-2 z-10 space-y-2">
+      <div 
+        className="absolute bg-white rounded-lg shadow-lg p-2 z-10 space-y-2"
+        style={{ 
+          left: `${toolbarPosition.x}px`, 
+          top: `${toolbarPosition.y}px`,
+          cursor: isDraggingToolbar ? 'grabbing' : 'auto'
+        }}
+      >
+        {/* Drag Handle */}
+        <div
+          onMouseDown={handleToolbarMouseDown}
+          className="flex items-center justify-center gap-1 p-2 bg-gray-100 rounded cursor-grab active:cursor-grabbing hover:bg-gray-200 mb-2"
+          title="Drag to move"
+        >
+          <Move size={16} className="text-gray-600" />
+          <span className="text-xs font-medium text-gray-700">Move Toolbar</span>
+        </div>
+        
         <div className="flex gap-1">
           <button
             onClick={() => setCurrentTool('pen')}

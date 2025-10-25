@@ -11,10 +11,35 @@ export const useAuth = () => {
   const router = useRouter()
 
   useEffect(() => {
+    // Try to load from cache first for faster display
+    const cached = localStorage.getItem('auth_cache')
+    if (cached) {
+      try {
+        const cachedData = JSON.parse(cached)
+        // Only use cache if less than 5 minutes old
+        if (Date.now() - cachedData.timestamp < 5 * 60 * 1000) {
+          setUser(cachedData.user)
+          setLoading(false)
+        }
+      } catch (e) {
+        console.error('Failed to parse auth cache:', e)
+      }
+    }
+    
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
       setLoading(false)
+      
+      // Cache the auth state
+      if (session?.user) {
+        localStorage.setItem('auth_cache', JSON.stringify({
+          user: session.user,
+          timestamp: Date.now()
+        }))
+      } else {
+        localStorage.removeItem('auth_cache')
+      }
     })
 
     // Listen for auth changes
@@ -23,9 +48,20 @@ export const useAuth = () => {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
       setLoading(false)
+      
+      // Update cache on auth state changes
+      if (session?.user) {
+        localStorage.setItem('auth_cache', JSON.stringify({
+          user: session.user,
+          timestamp: Date.now()
+        }))
+      } else {
+        localStorage.removeItem('auth_cache')
+      }
     })
 
     return () => subscription.unsubscribe()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const signIn = async (email: string, password: string) => {
@@ -90,6 +126,11 @@ export const useAuth = () => {
       const { error } = await supabase.auth.signOut()
       if (error) throw error
 
+      // Clear all caches
+      localStorage.removeItem('auth_cache')
+      localStorage.removeItem('payment_status')
+      localStorage.removeItem('projects_cache')
+      
       router.push('/auth/login')
       return { success: true }
     } catch (error: any) {
