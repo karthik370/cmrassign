@@ -93,37 +93,9 @@ export const PDFEditor = ({ project, font, pageEdits: initialPageEdits }: PDFEdi
     })
   }, [currentPage])
 
-  // Load fontSize, fontWeight and inkColor from current page data
-  useEffect(() => {
-    const currentEdit = pageEdits[currentPage]
-    if (currentEdit?.text_content?.[0]) {
-      const savedFontSize = currentEdit.text_content[0].fontSize
-      const savedFontWeight = currentEdit.text_content[0].fontWeight
-      const savedLetterSpacing = currentEdit.text_content[0].letterSpacing
-      const savedColor = currentEdit.text_content[0].color
-      
-      if (savedFontSize && savedFontSize !== fontSize) {
-        setFontSize(savedFontSize)
-      }
-      
-      if (savedFontWeight && savedFontWeight !== fontWeight) {
-        setFontWeight(savedFontWeight)
-      }
-      
-      if (savedLetterSpacing !== undefined && savedLetterSpacing !== letterSpacing) {
-        setLetterSpacing(savedLetterSpacing)
-      }
-      
-      if (savedColor && savedColor !== inkColor) {
-        setInkColor(savedColor as InkColor)
-      }
-    }
-    
-    // Also check ink_color field as fallback
-    if (currentEdit?.ink_color && currentEdit.ink_color !== inkColor) {
-      setInkColor(currentEdit.ink_color as InkColor)
-    }
-  }, [currentPage, pageEdits])
+  // REMOVED: Don't load page-specific settings
+  // Settings from page 1 now apply globally to all pages
+  // This ensures consistent formatting across the entire document
 
   // Handle client-detected page count
   const handlePageCountDetected = (detectedCount: number) => {
@@ -143,9 +115,9 @@ export const PDFEditor = ({ project, font, pageEdits: initialPageEdits }: PDFEdi
               id: generateId(),
               project_id: project.id,
               page_number: i,
-              text_content: [{ id: 'main', text: '', x: 0, y: 0, width: 0, height: 0, fontSize: 24, color: 'black' }],
+              text_content: [{ id: 'main', text: '', x: 0, y: 0, width: 0, height: 0, fontSize, fontWeight, letterSpacing, color: inkColor }],
               detected_areas: null,
-              ink_color: 'black',
+              ink_color: inkColor,
               line_colors: {},
               dimensions: DEFAULT_DIMENSIONS,
               created_at: new Date().toISOString(),
@@ -187,14 +159,14 @@ export const PDFEditor = ({ project, font, pageEdits: initialPageEdits }: PDFEdi
       
       for (let i = 1; i <= actualPageCount; i++) {
         if (!newPageEdits[i]) {
-          // Initialize empty text content for each page with default dimensions
+          // Initialize empty text content for each page with current global settings
           newPageEdits[i] = {
             id: generateId(),
             project_id: project.id,
             page_number: i,
-            text_content: [{ id: 'main', text: '', x: 0, y: 0, width: 0, height: 0, fontSize: 24, color: 'black' }],
+            text_content: [{ id: 'main', text: '', x: 0, y: 0, width: 0, height: 0, fontSize, fontWeight, letterSpacing, color: inkColor }],
             detected_areas: null,
-            ink_color: 'black',
+            ink_color: inkColor,
             line_colors: {},
             dimensions: DEFAULT_DIMENSIONS,
             created_at: new Date().toISOString(),
@@ -334,83 +306,75 @@ export const PDFEditor = ({ project, font, pageEdits: initialPageEdits }: PDFEdi
 
   const handleColorChange = (color: InkColor) => {
     setInkColor(color)
-    const currentEdit = pageEdits[currentPage]
-    if (!currentEdit) return
-
-    const updatedTextContent = currentEdit.text_content?.map((block) => ({
-      ...block,
-      color,
-    })) || []
-
-    setPageEdits({
-      ...pageEdits,
-      [currentPage]: {
-        ...currentEdit,
-        text_content: updatedTextContent,
+    // Apply color to ALL pages globally
+    const updatedPageEdits = { ...pageEdits }
+    
+    Object.keys(updatedPageEdits).forEach((pageNum) => {
+      const page = updatedPageEdits[Number(pageNum)]
+      updatedPageEdits[Number(pageNum)] = {
+        ...page,
+        text_content: page.text_content?.map((block) => ({ ...block, color })) || [],
         ink_color: color,
         updated_at: new Date().toISOString(),
-      },
+      }
     })
+
+    setPageEdits(updatedPageEdits)
+    console.log('🎨 Ink color applied to ALL pages:', color)
   }
 
   const handleFontSizeChange = (size: number) => {
     setFontSize(size)
-    const currentEdit = pageEdits[currentPage]
-    if (!currentEdit) return
-
-    const updatedTextContent = currentEdit.text_content?.map((block) => ({
-      ...block,
-      fontSize: size,
-    })) || []
-
-    setPageEdits({
-      ...pageEdits,
-      [currentPage]: {
-        ...currentEdit,
-        text_content: updatedTextContent,
+    // Apply font size to ALL pages globally
+    const updatedPageEdits = { ...pageEdits }
+    
+    Object.keys(updatedPageEdits).forEach((pageNum) => {
+      const page = updatedPageEdits[Number(pageNum)]
+      updatedPageEdits[Number(pageNum)] = {
+        ...page,
+        text_content: page.text_content?.map((block) => ({ ...block, fontSize: size })) || [],
         updated_at: new Date().toISOString(),
-      },
+      }
     })
+
+    setPageEdits(updatedPageEdits)
+    console.log('📏 Font size applied to ALL pages:', size)
   }
 
   const handleFontWeightChange = (weight: number) => {
     setFontWeight(weight)
-    const currentEdit = pageEdits[currentPage]
-    if (!currentEdit) return
-
-    const updatedTextContent = currentEdit.text_content?.map((block) => ({
-      ...block,
-      fontWeight: weight,
-    })) || []
-
-    setPageEdits({
-      ...pageEdits,
-      [currentPage]: {
-        ...currentEdit,
-        text_content: updatedTextContent,
+    // Apply font weight to ALL pages globally
+    const updatedPageEdits = { ...pageEdits }
+    
+    Object.keys(updatedPageEdits).forEach((pageNum) => {
+      const page = updatedPageEdits[Number(pageNum)]
+      updatedPageEdits[Number(pageNum)] = {
+        ...page,
+        text_content: page.text_content?.map((block) => ({ ...block, fontWeight: weight })) || [],
         updated_at: new Date().toISOString(),
-      },
+      }
     })
+
+    setPageEdits(updatedPageEdits)
+    console.log('💪 Font weight applied to ALL pages:', weight)
   }
 
   const handleLetterSpacingChange = (spacing: number) => {
     setLetterSpacing(spacing)
-    const currentEdit = pageEdits[currentPage]
-    if (!currentEdit) return
-
-    const updatedTextContent = currentEdit.text_content?.map((block) => ({
-      ...block,
-      letterSpacing: spacing,
-    })) || []
-
-    setPageEdits({
-      ...pageEdits,
-      [currentPage]: {
-        ...currentEdit,
-        text_content: updatedTextContent,
+    // Apply letter spacing to ALL pages globally
+    const updatedPageEdits = { ...pageEdits }
+    
+    Object.keys(updatedPageEdits).forEach((pageNum) => {
+      const page = updatedPageEdits[Number(pageNum)]
+      updatedPageEdits[Number(pageNum)] = {
+        ...page,
+        text_content: page.text_content?.map((block) => ({ ...block, letterSpacing: spacing })) || [],
         updated_at: new Date().toISOString(),
-      },
+      }
     })
+
+    setPageEdits(updatedPageEdits)
+    console.log('🔤 Letter spacing applied to ALL pages:', spacing)
   }
 
   const handleFontChange = async (fontName: string, fontUrl: string) => {
@@ -439,17 +403,19 @@ export const PDFEditor = ({ project, font, pageEdits: initialPageEdits }: PDFEdi
   }
 
   const handleDimensionsChange = (dimensions: PageDimensions) => {
-    const currentEdit = pageEdits[currentPage]
-    if (!currentEdit) return
-
-    setPageEdits({
-      ...pageEdits,
-      [currentPage]: {
-        ...currentEdit,
+    // Apply dimensions to ALL pages globally
+    const updatedPageEdits = { ...pageEdits }
+    
+    Object.keys(updatedPageEdits).forEach((pageNum) => {
+      updatedPageEdits[Number(pageNum)] = {
+        ...updatedPageEdits[Number(pageNum)],
         dimensions,
         updated_at: new Date().toISOString(),
-      },
+      }
     })
+
+    setPageEdits(updatedPageEdits)
+    console.log('📐 Dimensions applied to ALL pages:', dimensions)
   }
 
   const handleDrawingChange = (drawing: any[]) => {
