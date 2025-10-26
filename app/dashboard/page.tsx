@@ -4,7 +4,7 @@ import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
 import { Header } from '@/components/layout/Header'
 import { Sidebar } from '@/components/layout/Sidebar'
 import Link from 'next/link'
-import { FileText, Type, Plus, BookOpen } from 'lucide-react'
+import { FileText, Type, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { useProjects } from '@/hooks/useProjects'
 import { useFonts } from '@/hooks/useFonts'
@@ -93,19 +93,7 @@ export default function DashboardPage() {
                 <h2 className="text-xl md:text-2xl font-bold text-white mb-4 md:mb-6">
                   Quick Actions
                 </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
-                  <Link href="/instructions">
-                    <Button className="w-full h-14 bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 hover:scale-105 transition-all duration-300 shadow-lg">
-                      <BookOpen size={20} className="mr-2" />
-                      How to Create Font
-                    </Button>
-                  </Link>
-                  <Link href="/fonts/upload">
-                    <Button className="w-full h-14 bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 hover:scale-105 transition-all duration-300 shadow-lg">
-                      <Type size={20} className="mr-2" />
-                      Upload Font
-                    </Button>
-                  </Link>
+                <div className="max-w-md">
                   {hasReachedLimit ? (
                     <div>
                       <Button disabled className="w-full h-14 bg-red-500/20 backdrop-blur-sm border border-red-500/30 text-red-300 opacity-60 cursor-not-allowed">
