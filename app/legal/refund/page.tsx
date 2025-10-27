@@ -117,8 +117,8 @@ export default function RefundPage() {
               For questions about this Refund Policy or to request a refund (when applicable), contact us at:
             </p>
             <p className="text-gray-700 mb-4">
-              Email: <strong>support@cmrassignment.com</strong><br />
-              Website: <Link href="/" className="text-blue-600 hover:underline">cmrassignment.com</Link>
+              Email: <a href="mailto:37karthikreddy@gmail.com" className="text-blue-600 hover:underline font-semibold">37karthikreddy@gmail.com</a><br />
+              Website: <Link href="/" className="text-blue-600 hover:underline">https://cmrassign.vercel.app</Link>
             </p>
 
             <div className="mt-12 pt-8 border-t border-gray-200">

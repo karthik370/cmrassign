@@ -112,7 +112,7 @@ export default function PrivacyPage() {
               <li><strong>Restriction:</strong> Request limitation of data processing</li>
             </ul>
             <p className="text-gray-700 mb-4">
-              To exercise these rights, contact us at <strong>support@cmrassignment.com</strong>
+              To exercise these rights, contact us at <a href="mailto:37karthikreddy@gmail.com" className="text-blue-600 hover:underline font-semibold">37karthikreddy@gmail.com</a>
             </p>
 
             <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">8. Cookies and Tracking</h2>
@@ -172,8 +172,8 @@ export default function PrivacyPage() {
               For questions, concerns, or requests regarding this Privacy Policy or your personal data, contact us at:
             </p>
             <p className="text-gray-700 mb-4">
-              <strong>Email:</strong> support@cmrassignment.com<br />
-              <strong>Website:</strong> <Link href="/" className="text-blue-600 hover:underline">cmrassignment.com</Link>
+              <strong>Email:</strong> <a href="mailto:37karthikreddy@gmail.com" className="text-blue-600 hover:underline">37karthikreddy@gmail.com</a><br />
+              <strong>Website:</strong> <Link href="/" className="text-blue-600 hover:underline">https://cmrassign.vercel.app</Link>
             </p>
 
             <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">15. Consent</h2>

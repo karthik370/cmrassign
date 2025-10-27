@@ -126,8 +126,8 @@ export default function TermsPage() {
               For questions about these Terms, please contact us at:
             </p>
             <p className="text-gray-700 mb-4">
-              Email: support@cmrassignment.com<br />
-              Website: <Link href="/" className="text-blue-600 hover:underline">cmrassignment.com</Link>
+              Email: <a href="mailto:37karthikreddy@gmail.com" className="text-blue-600 hover:underline">37karthikreddy@gmail.com</a><br />
+              Website: <Link href="/" className="text-blue-600 hover:underline">https://cmrassign.vercel.app</Link>
             </p>
 
             <div className="mt-12 pt-8 border-t border-gray-200">
